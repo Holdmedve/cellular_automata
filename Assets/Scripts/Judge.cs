@@ -10,8 +10,10 @@ public class Judge : MonoBehaviour
 
     public GameObject cellPrefab;
     public int gridSize = 100;
-    float gridPointDst = 1.0f;
+    public float gridPointDst = 1.0f;
+    public bool wallsArePortals = false;
     GameObject[,,] cells; // A TYPE LEHETNE CELL
+
 
 
     // Start is called before the first frame update
@@ -73,7 +75,7 @@ public class Judge : MonoBehaviour
                     for(int i = 0; i < 6; i++)
                     {
                         int[] neighbour = {x + offsets[i, 0], y + offsets[i, 1], z + offsets[i, 2]};
-                        if(ValidIndeces(neighbour))
+                        if(ValidIndeces(ref neighbour))
                         {
                             int _x = neighbour[0];
                             int _y = neighbour[1];
@@ -88,8 +90,20 @@ public class Judge : MonoBehaviour
         }
     }
 
-    bool ValidIndeces(int[] coordinates)
+    bool ValidIndeces(ref int[] coordinates)
     {
+        if(wallsArePortals)
+        {
+            for(int i = 0; i < 3; i++)
+            {
+                if (coordinates[i] == -1)
+                    coordinates[i] = gridSize -1;
+                else if(coordinates[i] == gridSize)
+                    coordinates[i] = 0;
+            }
+            return true;
+        }
+
         foreach(int coo in coordinates)
             if(coo < 0 || coo >= gridSize)
                 return false;
@@ -149,7 +163,8 @@ public class Judge : MonoBehaviour
             4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
         */
 
-        foreach(GameObject cellGo in cells)
+        foreach(GameObject cellGo in cells) // EZ HÜLYESÉG VÉGIGMENNI MINDEGYIKEN
+        // INKÁBB GENERÁLD A VERDICTET AZ EVENTHANDLER-ekben
         {
             Cell c = cellGo.GetComponent<Cell>();
             c.verdict = null;

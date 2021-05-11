@@ -343,4 +343,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellPrefab: {fileID: 2813372599777140098, guid: fd647d5615c456942b93abae68d010f7, type: 3}
-  gridSize: 50
+  gridSize: 10
+  gridPointDst: 1
+  wallsArePortals: 1
