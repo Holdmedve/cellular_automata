@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public enum CellState
 {
@@ -11,57 +12,51 @@ public enum CellState
 public class Cell : MonoBehaviour
 {   
     public List<GameObject> neighbours = new List<GameObject>();
-    public int liveNeighbourCount {get; private set;}
+    
+    //public int liveNeighbourCount {get; private set;} = 0;
+    public int liveNeighbourCount = 0;
 
     public CellState state {get; private set;}
+
 
     // the verdict decides the fate of this cell
     public delegate void Verdict(Cell c);
     public Verdict verdict;
 
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-
-    public delegate void Death();
-    public event Death DeathEvent;
-    public void OnDeath()
+    public event EventHandler DeathEvent;
+    public void OnDeath(EventArgs e)
     {
         state = CellState.dead;
-        DeathEvent?.Invoke();
+        DeathEvent?.Invoke(this, e);
     }
-    public void OnNeighbourDeath()
+    public void OnNeighbourDeath(object sender, EventArgs e)
     {
         liveNeighbourCount--;
+        Debug.Log("liveneighbourcount: " + liveNeighbourCount);
+    }
+
+    public int GetDeathSubscriberCount()
+    {
+        return DeathEvent.GetInvocationList().Length;
     }
 
 
-    public delegate void Birth();
-    public event Birth BirthEvent;
-    public void OnBirth()
+    public event EventHandler  BirthEvent;
+    public void OnBirth(EventArgs e)
     {
         state = CellState.living;
-        BirthEvent?.Invoke();
+        BirthEvent.Invoke(this, e);
     }
-    public void OnNeighbourBirth()
+    public void OnNeighbourBirth(object sender, EventArgs e)
     {
         liveNeighbourCount++;
+        Debug.Log("liveneighbourcount: " + liveNeighbourCount);
     } 
-
-    public void OnLive()
+    public int GetBirthSubscriberCount()
     {
-
-    }  
-    
-
-
-
-    // Update is called once per frame
-    void Update()
-    {
+        return BirthEvent.GetInvocationList().Length;
     }
+
 
 }

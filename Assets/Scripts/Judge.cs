@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+
 
 public class Judge : MonoBehaviour
 {
@@ -18,7 +20,14 @@ public class Judge : MonoBehaviour
         InitPopulation();
         ConnectNeighbours();
         PopulationBirth();
+        
         RandomKilling();
+        foreach(GameObject cellGo in cells)
+            Debug.Log("Death subscriber count: " + cellGo.GetComponent<Cell>().GetDeathSubscriberCount());
+
+        foreach(GameObject cellGo in cells)
+            Debug.Log("Birth subscriber count: " + cellGo.GetComponent<Cell>().GetBirthSubscriberCount());
+
     }
     void PopulationBirth()
     {
@@ -29,7 +38,7 @@ public class Judge : MonoBehaviour
     void RandomKilling()
     {
         foreach(GameObject cellGo in cells)
-            if(Random.Range(0.0f, 1.0f) < 0.8f)
+            if(UnityEngine.Random.Range(0.0f, 1.0f) < 0.5f)
                 Death(cellGo.GetComponent<Cell>());
     }
 
@@ -111,9 +120,8 @@ public class Judge : MonoBehaviour
 
     int counter = 1;
     // Update is called once per frame
-    void Update()
-    {
-        if(counter % 100 == 0){
+    void FixedUpdate() {
+        if(counter % 5 == 0){
             GenerateVerdict();
             ExecuteVerdict();
         }
@@ -123,13 +131,13 @@ public class Judge : MonoBehaviour
     void Death(Cell c)
     {
         c.gameObject.GetComponent<MeshRenderer>().enabled = false;
-        c.OnDeath();
+        c.OnDeath(EventArgs.Empty);
     }
 
     void Birth(Cell c)
     {
         c.gameObject.GetComponent<MeshRenderer>().enabled = true;
-        c.OnBirth();
+        c.OnBirth(EventArgs.Empty);
     }
 
 
@@ -161,7 +169,7 @@ public class Judge : MonoBehaviour
                 if(c.liveNeighbourCount < 2 || c.liveNeighbourCount > 3)
                     c.verdict = Death;
             }
-            else
+            else if(c.state == CellState.dead)
             {
                 if(c.liveNeighbourCount == 3)
                     c.verdict = Birth;
