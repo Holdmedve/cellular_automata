@@ -16,15 +16,21 @@ public class Judge : MonoBehaviour
     void Start()
     {
         InitPopulation();
+        ConnectNeighbours();
+        PopulationBirth();
         RandomKilling();
+    }
+    void PopulationBirth()
+    {
+        foreach(GameObject cellGo in cells)
+            Birth(cellGo.GetComponent<Cell>());
     }
 
     void RandomKilling()
     {
         foreach(GameObject cellGo in cells)
-        {
-
-        }
+            if(Random.Range(0.0f, 1.0f) < 0.8f)
+                Death(cellGo.GetComponent<Cell>());
     }
 
     void InitPopulation()
@@ -47,8 +53,6 @@ public class Judge : MonoBehaviour
                 }
             }
         }
-
-        ConnectNeighbours();
     }
 
     void ConnectNeighbours()
@@ -105,20 +109,26 @@ public class Judge : MonoBehaviour
         return pos;
     }
 
+    int counter = 1;
     // Update is called once per frame
     void Update()
-    {        
+    {
+        if(counter % 100 == 0){
+            GenerateVerdict();
+            ExecuteVerdict();
+        }
+        counter++;
     }
 
     void Death(Cell c)
     {
-        c.gameObject.SetActive(false);
+        c.gameObject.GetComponent<MeshRenderer>().enabled = false;
         c.OnDeath();
     }
 
     void Birth(Cell c)
     {
-        c.gameObject.SetActive(true);
+        c.gameObject.GetComponent<MeshRenderer>().enabled = true;
         c.OnBirth();
     }
 
@@ -128,7 +138,8 @@ public class Judge : MonoBehaviour
         foreach(GameObject cellGo in cells)
         {
             Cell c = cellGo.GetComponent<Cell>();
-            c.verdict(c);
+            if(c.verdict != null)
+                c.verdict(c);
         }
     }
 
@@ -144,6 +155,7 @@ public class Judge : MonoBehaviour
         foreach(GameObject cellGo in cells)
         {
             Cell c = cellGo.GetComponent<Cell>();
+            c.verdict = null;
             if(c.state == CellState.living)
             {
                 if(c.liveNeighbourCount < 2 || c.liveNeighbourCount > 3)

@@ -30,6 +30,7 @@ public class Cell : MonoBehaviour
     public event Death DeathEvent;
     public void OnDeath()
     {
+        state = CellState.dead;
         DeathEvent?.Invoke();
     }
     public void OnNeighbourDeath()
@@ -42,6 +43,7 @@ public class Cell : MonoBehaviour
     public event Birth BirthEvent;
     public void OnBirth()
     {
+        state = CellState.living;
         BirthEvent?.Invoke();
     }
     public void OnNeighbourBirth()
