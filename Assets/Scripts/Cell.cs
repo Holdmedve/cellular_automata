@@ -13,8 +13,7 @@ public class Cell : MonoBehaviour
 {   
     public List<GameObject> neighbours = new List<GameObject>();
     
-    //public int liveNeighbourCount {get; private set;} = 0;
-    public int liveNeighbourCount = 0;
+    public int liveNeighbourCount {get; private set;} = 0;
 
     public CellState state {get; private set;}
 
@@ -33,7 +32,6 @@ public class Cell : MonoBehaviour
     public void OnNeighbourDeath(object sender, EventArgs e)
     {
         liveNeighbourCount--;
-        Debug.Log("liveneighbourcount: " + liveNeighbourCount);
     }
 
     public int GetDeathSubscriberCount()
@@ -46,12 +44,11 @@ public class Cell : MonoBehaviour
     public void OnBirth(EventArgs e)
     {
         state = CellState.living;
-        BirthEvent.Invoke(this, e);
+        BirthEvent?.Invoke(this, e);
     }
     public void OnNeighbourBirth(object sender, EventArgs e)
     {
         liveNeighbourCount++;
-        Debug.Log("liveneighbourcount: " + liveNeighbourCount);
     } 
     public int GetBirthSubscriberCount()
     {

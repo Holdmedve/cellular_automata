@@ -20,14 +20,7 @@ public class Judge : MonoBehaviour
         InitPopulation();
         ConnectNeighbours();
         PopulationBirth();
-        
         RandomKilling();
-        foreach(GameObject cellGo in cells)
-            Debug.Log("Death subscriber count: " + cellGo.GetComponent<Cell>().GetDeathSubscriberCount());
-
-        foreach(GameObject cellGo in cells)
-            Debug.Log("Birth subscriber count: " + cellGo.GetComponent<Cell>().GetBirthSubscriberCount());
-
     }
     void PopulationBirth()
     {
@@ -46,19 +39,15 @@ public class Judge : MonoBehaviour
     {
         cells = new GameObject[gridSize, gridSize, gridSize];
         
-        // x, z are ground coordinates in unity
-        // y is up-down
-        int cellIdx = 0;
         for(int x = 0; x < gridSize; x++)
         {
-            for(int z = 0; z < gridSize; z++)
+            for(int y = 0; y < gridSize; y++)
             {
-                for(int y = 0; y < gridSize; y++)
+                for(int z = 0; z < gridSize; z++)
                 {
-                    Vector3 pos = CalcCellPos(x, z, y);
-                    cells[x, z, y] = Instantiate(cellPrefab, pos, new Quaternion());
-                    cells[x, z, y].AddComponent<Cell>();
-                    cellIdx++;
+                    Vector3 pos = CalcCellPos(x, y, z);
+                    cells[x, y, z] = Instantiate(cellPrefab, pos, new Quaternion());
+                    cells[x, y, z].AddComponent<Cell>();
                 }
             }
         }
@@ -76,22 +65,22 @@ public class Judge : MonoBehaviour
 
         for(int x = 0; x < gridSize; x++)
         {
-            for(int z = 0; z < gridSize; z++)
+            for(int y = 0; y < gridSize; y++)
             {
-                for(int y = 0; y < gridSize; y++)
+                for(int z = 0; z < gridSize; z++)
                 {
                     Cell cell = cells[x, y, z].GetComponent<Cell>();
                     for(int i = 0; i < 6; i++)
                     {
-                        int[] neighbour = {x + offsets[i, 0], z + offsets[i, 1], y + offsets[i, 2]};
-                        if(ValidCoordinates(neighbour))
+                        int[] neighbour = {x + offsets[i, 0], y + offsets[i, 1], z + offsets[i, 2]};
+                        if(ValidIndeces(neighbour))
                         {
                             int _x = neighbour[0];
-                            int _z = neighbour[1];
-                            int _y = neighbour[2];
-                            cell.neighbours.Add(cells[_x, _z, _y]);
-                            cells[_x, _z, _y].GetComponent<Cell>().DeathEvent += cell.OnNeighbourDeath;
-                            cells[_x, _z, _y].GetComponent<Cell>().BirthEvent += cell.OnNeighbourBirth;
+                            int _y = neighbour[1];
+                            int _z = neighbour[2];
+                            cell.neighbours.Add(cells[_x, _y, _z]);
+                            cells[_x, _y, _z].GetComponent<Cell>().DeathEvent += cell.OnNeighbourDeath;
+                            cells[_x, _y, _z].GetComponent<Cell>().BirthEvent += cell.OnNeighbourBirth;
                         }
                     }
                 }
@@ -99,7 +88,7 @@ public class Judge : MonoBehaviour
         }
     }
 
-    bool ValidCoordinates(int[] coordinates)
+    bool ValidIndeces(int[] coordinates)
     {
         foreach(int coo in coordinates)
             if(coo < 0 || coo >= gridSize)
@@ -108,12 +97,12 @@ public class Judge : MonoBehaviour
         return true;
     }
 
-    Vector3 CalcCellPos(int xIdx, int zIdx, int yIdx)
+    Vector3 CalcCellPos(int xIdx, int yIdx, int zIdx)
     {
         float xPos = gridPointDst * xIdx;
-        float zPos = gridPointDst * zIdx;
         float yPos = gridPointDst * yIdx;
-        Vector3 pos = new Vector3(xPos, zPos, yPos);
+        float zPos = gridPointDst * zIdx;
+        Vector3 pos = new Vector3(xPos, yPos, zPos);
 
         return pos;
     }
