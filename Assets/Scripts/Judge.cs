@@ -16,6 +16,15 @@ public class Judge : MonoBehaviour
     void Start()
     {
         InitPopulation();
+        RandomKilling();
+    }
+
+    void RandomKilling()
+    {
+        foreach(GameObject cellGo in cells)
+        {
+
+        }
     }
 
     void InitPopulation()
@@ -44,7 +53,7 @@ public class Judge : MonoBehaviour
 
     void ConnectNeighbours()
     {
-        // idx offsets in all 6 directions
+        // offsets in all 6 directions
         int[,] offsets = {{ 1, 0, 0},
                           {-1, 0, 0},
                           { 0, 1, 0},
@@ -68,12 +77,13 @@ public class Judge : MonoBehaviour
                             int _z = neighbour[1];
                             int _y = neighbour[2];
                             cell.neighbours.Add(cells[_x, _z, _y]);
+                            cells[_x, _z, _y].GetComponent<Cell>().DeathEvent += cell.OnNeighbourDeath;
+                            cells[_x, _z, _y].GetComponent<Cell>().BirthEvent += cell.OnNeighbourBirth;
                         }
                     }
                 }
             }
         }
-
     }
 
     bool ValidCoordinates(int[] coordinates)
@@ -97,26 +107,29 @@ public class Judge : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-
-        
+    {        
     }
 
-    public delegate void DeathDelegate();
-    void Death()
+    void Death(Cell c)
     {
-
+        c.gameObject.SetActive(false);
+        c.OnDeath();
     }
 
-    void BeBorn()
+    void Birth(Cell c)
     {
-
+        c.gameObject.SetActive(true);
+        c.OnBirth();
     }
 
 
     void ExecuteVerdict()
     {
-        //foreach(GameObject )
+        foreach(GameObject cellGo in cells)
+        {
+            Cell c = cellGo.GetComponent<Cell>();
+            c.verdict(c);
+        }
     }
 
     void GenerateVerdict()
@@ -139,7 +152,7 @@ public class Judge : MonoBehaviour
             else
             {
                 if(c.liveNeighbourCount == 3)
-                    c.verdict = BeBorn;
+                    c.verdict = Birth;
             }            
         }
         
