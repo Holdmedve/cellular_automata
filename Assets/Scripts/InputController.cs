@@ -18,6 +18,7 @@ public class InputController : MonoBehaviour
             return;
         
         automataController.rule = ConvertTo8Bit(rule);
+        automataController.StartSimulation();
     }
 
     bool OutsideBounds(int i)
@@ -50,6 +51,6 @@ public class InputController : MonoBehaviour
 
     public void OnStop()
     {
-
+        automataController.StopSimulation();
     }
 }

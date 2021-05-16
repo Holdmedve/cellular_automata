@@ -4,37 +4,63 @@ using UnityEngine;
 
 public class AutomataController : MonoBehaviour
 {
+    [Header("Cell settings")]
     public GameObject cell;
     public float cellSize = 1.0f;
-    public float stepTime = 1.0f;
-    
-    
-    public string rule = "00011110";
-    string row = "00100";
+    public float speed = 1.0f;
+    public float timeToDie = 10f;
 
+    [Header("Row settings")]
+    public int widthLimit = 10;
+    public string rule = "00011110";
+
+
+    const string seed = "00100";
+    string row;
     
-    // Start is called before the first frame update
+    GameObject cellParent;
     void Start()
     {
-        StartCoroutine(Simulate());    
+        cellParent = GameObject.Find("CellParent");
+    }
+    
+    public void StartSimulation()
+    {
+        row = seed;
+        GameObject rowFollower = GameObject.Find("RowFollower");
+        rowFollower.AddComponent<Move>().speed = speed;
+        GenerateRow();
     }
 
-    IEnumerator Simulate()
+    public void StopSimulation()
     {
-        while(false)
-        {
-            SpawnCells();
-            yield return new WaitForSeconds(stepTime);
-            row = ApplyRule();
-        }
+        row = seed;
+        GameObject rowFollower = GameObject.Find("RowFollower");
+        Destroy(rowFollower.GetComponent<Move>());
     }
 
-    string ApplyRule()
+    public void GenerateRow()
     {
-        string newRow = "00";
+        SpawnCells();
+        bool widthExceeded = CheckWidth();
+        row = ApplyRule(widthExceeded);
+    }
+
+    bool CheckWidth()
+    {
+        if(row.Length > widthLimit)
+            return true;
+        return false;
+    }
+
+    string ApplyRule(bool widthExceeded)
+    {
+        string newRow = (widthExceeded)? "": "00";
+
         for(int i = 0; i < row.Length - 2; i++)
         {
             // without "" it wants to add the asci value of the chars
+            // other solution: string h = word.Substring(start, length); in case current one is slow
             string pattern = "" + row[i] + row[i + 1] + row[i + 2];
 
             // 111 110 101 100 011 010 001 000
@@ -54,9 +80,9 @@ public class AutomataController : MonoBehaviour
             }
         }
 
-        newRow += "00";
-
-        // other solution: string h = word.Substring(start, length);
+        if(widthExceeded == false)
+            newRow += "00";
+        
         return newRow;
     }
 
@@ -64,8 +90,7 @@ public class AutomataController : MonoBehaviour
     {
         Vector3 start = Vector3.zero;
         float xOffset = (row.Length / 2) * cellSize;
-        float zOffset = row.Length / 2 - 1;
-        start += new Vector3(xOffset, 1f, zOffset);
+        start += new Vector3(xOffset, 1f, 0f);
 
         Vector3 cellOffset = new Vector3(cellSize, 0f, 0f);
 
@@ -74,7 +99,9 @@ public class AutomataController : MonoBehaviour
             if(row[i] == '1')
             {
                 Vector3 pos = start + cellOffset * (-i);
-                Instantiate(cell, pos, new Quaternion());
+                GameObject go =  Instantiate(cell, pos, new Quaternion(), cellParent.transform);
+                go.AddComponent<Move>().speed = speed;
+                Destroy(go, timeToDie);
             }
         }
     }
