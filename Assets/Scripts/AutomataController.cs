@@ -6,10 +6,10 @@ public class AutomataController : MonoBehaviour
 {
     public GameObject cell;
     public float cellSize = 1.0f;
-    public string rule = "00011110";
     public float stepTime = 1.0f;
     
     
+    public string rule = "00011110";
     string row = "00100";
 
     
@@ -21,7 +21,7 @@ public class AutomataController : MonoBehaviour
 
     IEnumerator Simulate()
     {
-        while(true)
+        while(false)
         {
             SpawnCells();
             yield return new WaitForSeconds(stepTime);
