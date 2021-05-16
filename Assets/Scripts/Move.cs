@@ -12,8 +12,8 @@ public class Move : MonoBehaviour
 
     }
 
-    public void  OnSpeedChange(float newSpeed)
+    public void  OnSpeedChange()
     {
-        speed = newSpeed;
+        speed = InputController.GetSpeed();
     }
 }

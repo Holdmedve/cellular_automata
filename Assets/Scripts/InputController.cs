@@ -11,9 +11,16 @@ enum State
 
 public class InputController : MonoBehaviour
 {
-    public InputField ruleInput;
+    public static InputField ruleInput;
+    public static Dropdown speedSelector;
     public AutomataController automataController;
     State state;
+
+    void Start()
+    {
+        ruleInput = GameObject.Find("RuleInputField").GetComponent<InputField>();
+        speedSelector = GameObject.Find("SpeedDropdown").GetComponent<Dropdown>();
+    }
 
     public void OnStart()
     {
@@ -27,6 +34,7 @@ public class InputController : MonoBehaviour
         if(OutsideBounds(rule))
             return;
         
+        state = State.running;
         automataController.rule = ConvertTo8Bit(rule);
         automataController.StartSimulation();
     }
@@ -63,7 +71,24 @@ public class InputController : MonoBehaviour
     {
         if(state == State.idle)
             return;
-            
+
+        state = State.idle;
         automataController.StopSimulation();
+    }
+
+    public static float GetSpeed()
+    {
+        float speed;
+        switch(speedSelector.value)
+        {
+            case 0: speed = 1f; break;
+            case 1: speed = 5f; break;
+            case 2: speed = 10f; break;
+            case 3: speed = 0f; break;
+
+            default: speed = 1f; break;
+        }
+
+        return speed;
     }
 }

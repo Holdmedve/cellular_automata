@@ -8,7 +8,7 @@ public class AutomataController : MonoBehaviour
     [Header("Cell settings")]
     public GameObject cell;
     public float cellSize = 1.0f;
-    public Slider speedSlider;
+    public Dropdown speedSelector;
 
     [Header("Row settings")]
     public int widthLimit = 10;
@@ -34,7 +34,10 @@ public class AutomataController : MonoBehaviour
 
     public void StopSimulation()
     {
-
+        int rowCount = cellRows.transform.childCount;
+        Transform youngestRow = cellRows.transform.GetChild(rowCount - 1);
+        // won't collide with BirthGate, therefore no new row
+        youngestRow.gameObject.GetComponent<BoxCollider>().enabled = false;
     }
 
     public void GenerateRow()
@@ -85,19 +88,19 @@ public class AutomataController : MonoBehaviour
 
     void SpawnCells()
     {
+        // holds a row of cells 
+        // more efficient than moving individual cells
+        GameObject cellRow = new GameObject("CellRow");        
+        cellRow.transform.SetParent(cellRows.transform);
+        cellRow.tag = "CellRow";
+
         // left end pos of the row
         Vector3 leftEnd;
         float x = (row.Length / 2) * cellSize;
         leftEnd = new Vector3(x, 1f, 0f);
-
         Vector3 cellOffset = new Vector3(cellSize, 0f, 0f);
 
-        // holds the individual cells 
-        // more efficient than moving individual cells
-        GameObject cellRow = new GameObject("CellRow");
-        cellRow.transform.SetParent(cellRows.transform);
-        cellRow.tag = "CellRow";
-
+        // string together new row
         for(int i = 0; i < row.Length; i++)
         {
             if(row[i] == '1')
@@ -107,13 +110,17 @@ public class AutomataController : MonoBehaviour
             }
         }
 
+        StartMovingRow(cellRow);
+    }
+
+    void StartMovingRow(GameObject cellRow)
+    {
         // start moving the new row
-        cellRow.AddComponent<Move>().speed = speedSlider.value;
+        cellRow.AddComponent<Move>().speed = InputController.GetSpeed();
         Move move = cellRow.GetComponent<Move>();
-        speedSlider.onValueChanged.AddListener(delegate {move.OnSpeedChange(speedSlider.value);});
+        speedSelector.onValueChanged.AddListener(delegate {move.OnSpeedChange();});
         
         // to detect collision with the gates
         cellRow.AddComponent<BoxCollider>();
     }
-
 }
