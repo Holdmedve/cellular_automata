@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AutomataController : MonoBehaviour
 {
     [Header("Cell settings")]
     public GameObject cell;
     public float cellSize = 1.0f;
-    public float speed = 1.0f;
-    public float timeToDie = 10f;
+    public Slider speedSlider;
 
     [Header("Row settings")]
     public int widthLimit = 10;
@@ -16,6 +16,7 @@ public class AutomataController : MonoBehaviour
     public string rule = "00011110";
 
 
+    // one cell in the middle as a starting point
     const string seed = "00100";
     string row;
     
@@ -28,16 +29,12 @@ public class AutomataController : MonoBehaviour
     public void StartSimulation()
     {
         row = seed;
-        GameObject rowFollower = GameObject.Find("RowFollower");
-        rowFollower.AddComponent<Move>().speed = speed;
         GenerateRow();
     }
 
     public void StopSimulation()
     {
-        row = seed;
-        GameObject rowFollower = GameObject.Find("RowFollower");
-        Destroy(rowFollower.GetComponent<Move>());
+
     }
 
     public void GenerateRow()
@@ -56,7 +53,7 @@ public class AutomataController : MonoBehaviour
 
     string ApplyRule(bool widthExceeded)
     {
-        string newRow = (widthExceeded)? "": "00";
+        string newRow = (widthExceeded) ? "" : "00";
 
         for(int i = 0; i < row.Length - 2; i++)
         {
@@ -81,34 +78,42 @@ public class AutomataController : MonoBehaviour
             }
         }
 
-        if(widthExceeded == false)
-            newRow += "00";
+        newRow += (widthExceeded) ? "" : "00";
         
         return newRow;
     }
 
     void SpawnCells()
     {
-        Vector3 start = Vector3.zero;
-        float xOffset = (row.Length / 2) * cellSize;
-        start += new Vector3(xOffset, 1f, 0f);
+        // left end pos of the row
+        Vector3 leftEnd;
+        float x = (row.Length / 2) * cellSize;
+        leftEnd = new Vector3(x, 1f, 0f);
 
         Vector3 cellOffset = new Vector3(cellSize, 0f, 0f);
 
+        // holds the individual cells 
+        // more efficient than moving individual cells
         GameObject cellRow = new GameObject("CellRow");
         cellRow.transform.SetParent(cellRows.transform);
+        cellRow.tag = "CellRow";
 
         for(int i = 0; i < row.Length; i++)
         {
             if(row[i] == '1')
             {
-                Vector3 pos = start + cellOffset * (-i);
+                Vector3 pos = leftEnd + cellOffset * (-i);
                 GameObject go =  Instantiate(cell, pos, new Quaternion(), cellRow.transform);                                
             }
         }
 
-        cellRow.AddComponent<Move>().speed = speed;
-        Destroy(cellRow, timeToDie);
+        // start moving the new row
+        cellRow.AddComponent<Move>().speed = speedSlider.value;
+        Move move = cellRow.GetComponent<Move>();
+        speedSlider.onValueChanged.AddListener(delegate {move.OnSpeedChange(speedSlider.value);});
+        
+        // to detect collision with the gates
+        cellRow.AddComponent<BoxCollider>();
     }
 
 }
