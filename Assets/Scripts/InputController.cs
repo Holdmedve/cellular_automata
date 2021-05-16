@@ -3,13 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+enum State
+{
+    idle,
+    running
+}
+
 public class InputController : MonoBehaviour
 {
     public InputField ruleInput;
     public AutomataController automataController;
+    State state;
 
     public void OnStart()
     {
+        if(state == State.running)
+            return;
+
         if(ruleInput.text == "")
             return;
         
@@ -51,6 +61,9 @@ public class InputController : MonoBehaviour
 
     public void OnStop()
     {
+        if(state == State.idle)
+            return;
+            
         automataController.StopSimulation();
     }
 }

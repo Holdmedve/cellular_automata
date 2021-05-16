@@ -12,16 +12,17 @@ public class AutomataController : MonoBehaviour
 
     [Header("Row settings")]
     public int widthLimit = 10;
+    [HideInInspector()]
     public string rule = "00011110";
 
 
     const string seed = "00100";
     string row;
     
-    GameObject cellParent;
+    GameObject cellRows;
     void Start()
     {
-        cellParent = GameObject.Find("CellParent");
+        cellRows = GameObject.Find("CellRows");
     }
     
     public void StartSimulation()
@@ -94,16 +95,20 @@ public class AutomataController : MonoBehaviour
 
         Vector3 cellOffset = new Vector3(cellSize, 0f, 0f);
 
+        GameObject cellRow = new GameObject("CellRow");
+        cellRow.transform.SetParent(cellRows.transform);
+
         for(int i = 0; i < row.Length; i++)
         {
             if(row[i] == '1')
             {
                 Vector3 pos = start + cellOffset * (-i);
-                GameObject go =  Instantiate(cell, pos, new Quaternion(), cellParent.transform);
-                go.AddComponent<Move>().speed = speed;
-                Destroy(go, timeToDie);
+                GameObject go =  Instantiate(cell, pos, new Quaternion(), cellRow.transform);                                
             }
         }
+
+        cellRow.AddComponent<Move>().speed = speed;
+        Destroy(cellRow, timeToDie);
     }
 
 }
