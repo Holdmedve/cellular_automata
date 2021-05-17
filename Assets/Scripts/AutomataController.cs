@@ -8,7 +8,7 @@ public class AutomataController : MonoBehaviour
     [Header("Cell settings")]
     public GameObject cell;
     public float cellSize = 1.0f;
-    public Dropdown speedSelector;
+    public float colorEffectDuration = 1.0f;
 
     [Header("Row settings")]
     public int widthLimit = 10;
@@ -18,7 +18,7 @@ public class AutomataController : MonoBehaviour
 
     // one cell in the middle as a starting point
     const string seed = "00100";
-    string row;
+    string row; // consists of 0's and 1's indicating dead and live cells
     
     GameObject cellRows;
     void Start()
@@ -90,7 +90,7 @@ public class AutomataController : MonoBehaviour
     {
         // holds a row of cells 
         // more efficient than moving individual cells
-        GameObject cellRow = new GameObject("CellRow");        
+        GameObject cellRow = new GameObject("CellRow");
         cellRow.transform.SetParent(cellRows.transform);
         cellRow.tag = "CellRow";
 
@@ -100,27 +100,32 @@ public class AutomataController : MonoBehaviour
         leftEnd = new Vector3(x, 1f, 0f);
         Vector3 cellOffset = new Vector3(cellSize, 0f, 0f);
 
+        ColorChange colorChange = cellRow.AddComponent<ColorChange>();     
+        
         // string together new row
         for(int i = 0; i < row.Length; i++)
         {
             if(row[i] == '1')
             {
                 Vector3 pos = leftEnd + cellOffset * (-i);
-                GameObject go =  Instantiate(cell, pos, new Quaternion(), cellRow.transform);                                
+                GameObject go =  Instantiate(cell, pos, new Quaternion(), cellRow.transform);
+                colorChange.cellMatList.Add(go.GetComponent<Renderer>().material);
             }
         }
 
-        StartMovingRow(cellRow);
+        StartMovingRow(cellRow, colorChange);
     }
 
-    void StartMovingRow(GameObject cellRow)
+    void StartMovingRow(GameObject cellRow, ColorChange colorChange)
     {
         // start moving the new row
         cellRow.AddComponent<Move>().speed = InputController.GetSpeed();
         Move move = cellRow.GetComponent<Move>();
-        speedSelector.onValueChanged.AddListener(delegate {move.OnSpeedChange();});
+        InputController.speedSelector.onValueChanged.AddListener(delegate {move.OnSpeedChange();});
         
         // to detect collision with the gates
         cellRow.AddComponent<BoxCollider>();
+
+        StartCoroutine(colorChange.StartEffect(colorEffectDuration));
     }
 }

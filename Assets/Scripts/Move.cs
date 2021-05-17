@@ -9,7 +9,6 @@ public class Move : MonoBehaviour
     void FixedUpdate()
     {
         transform.position -= new Vector3(0, 0, speed * Time.deltaTime);
-
     }
 
     public void  OnSpeedChange()
