@@ -35,8 +35,9 @@ public class AutomataController : MonoBehaviour
     public void StopSimulation()
     {
         int rowCount = cellRows.transform.childCount;
+        if(rowCount == 0)
+            return;
         Transform youngestRow = cellRows.transform.GetChild(rowCount - 1);
-        // won't collide with BirthGate, therefore no new row
         youngestRow.gameObject.GetComponent<BoxCollider>().enabled = false;
     }
 
@@ -62,7 +63,8 @@ public class AutomataController : MonoBehaviour
         {
             // without "" it wants to add the asci value of the chars
             // other solution: string h = word.Substring(start, length); in case current one is slow
-            string pattern = "" + row[i] + row[i + 1] + row[i + 2];
+            //string pattern = "" + row[i] + row[i + 1] + row[i + 2];
+            string pattern = row.Substring(i, 3);
 
             // 111 110 101 100 011 010 001 000
             switch(pattern)
@@ -108,7 +110,7 @@ public class AutomataController : MonoBehaviour
             if(row[i] == '1')
             {
                 Vector3 pos = leftEnd + cellOffset * (-i);
-                GameObject go =  Instantiate(cell, pos, new Quaternion(), cellRow.transform);
+                GameObject go =  Instantiate(cell, pos, cell.transform.rotation, cellRow.transform);
                 colorChange.cellMatList.Add(go.GetComponent<Renderer>().material);
             }
         }

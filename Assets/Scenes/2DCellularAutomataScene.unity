@@ -2437,9 +2437,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6de5fa03162763544aa660ddeb2605bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cell: {fileID: 6656795449596061934, guid: c93885443d0db4d4fa8259c68b453474, type: 3}
+  cell: {fileID: 1033886207257531101, guid: 88a1853e61d7d0146bf84d79d29e2a34, type: 3}
   cellSize: 1
-  speedSelector: {fileID: 861604148}
+  colorEffectDuration: 1
   widthLimit: 200
   rule: 00011110
 --- !u!4 &1860748525
