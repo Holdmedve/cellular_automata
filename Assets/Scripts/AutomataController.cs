@@ -111,7 +111,6 @@ public class AutomataController : MonoBehaviour
             {
                 Vector3 pos = leftEnd + cellOffset * (-i);
                 GameObject go =  Instantiate(cell, pos, cell.transform.rotation, cellRow.transform);
-                colorChange.cellMatList.Add(go.GetComponent<Renderer>().material);
             }
         }
 
@@ -128,6 +127,7 @@ public class AutomataController : MonoBehaviour
         // to detect collision with the gates
         cellRow.AddComponent<BoxCollider>();
 
+        cellRow.AddComponent<CombineMeshes>();
         StartCoroutine(colorChange.StartEffect(colorEffectDuration));
     }
 }
