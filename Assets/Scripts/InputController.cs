@@ -15,11 +15,17 @@ public class InputController : MonoBehaviour
     public static Dropdown speedSelector;
     public AutomataController automataController;
     State state;
+    
+    // camera related stuff
+    Camera camera;
+    int[] zoomLevels = {10, 50, 100};
+    int currentZoomIdx = 1;
 
     void Start()
     {
         ruleInput = GameObject.Find("RuleInputField").GetComponent<InputField>();
         speedSelector = GameObject.Find("SpeedDropdown").GetComponent<Dropdown>();
+        camera = GameObject.Find("Main Camera").GetComponent<Camera>();
     }
 
     public void OnStart()
@@ -65,6 +71,29 @@ public class InputController : MonoBehaviour
         }
 
         return binaryRule;
+    }
+
+    public void OnZoomIn()
+    {
+        if(currentZoomIdx == 0)
+            return;
+    
+        currentZoomIdx--;
+        ChangeZoom();
+    }
+
+    void ChangeZoom()
+    {
+        camera.orthographicSize = zoomLevels[currentZoomIdx];
+    }
+
+    public void OnZoomOut()
+    {
+        if(currentZoomIdx == zoomLevels.Length - 1)
+            return;
+    
+        currentZoomIdx++;
+        ChangeZoom();
     }
 
     public void OnStop()
